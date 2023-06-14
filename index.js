@@ -27,10 +27,16 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
+    const userCollection = client.db('summerCampDb').collection('users')
     const classCollection = client.db('summerCampDb').collection('class')
     const instructorCollection = client.db('summerCampDb').collection('instructor')
     const cartCollection = client.db('summerCampDb').collection('carts')
 
+    app.post('/users', async(req, res) =>{
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result)
+    })
     app.get('/class', async(req, res) =>{
       const result = await classCollection.find().toArray()
       res.send(result)
@@ -41,6 +47,17 @@ async function run() {
     })
 
     // add to cart collection 
+    app.get('/carts', async(req, res) =>{
+      const email = req.query.email;
+      console.log(email)
+      if (!email) {
+        res.send([])
+      }
+      const query = {email: email}
+      const result = await cartCollection.find(query).toArray()
+      res.send(result)
+    })
+
     app.post('/carts', async (req, res) =>{
       const item = req.body;
       console.log(item)
